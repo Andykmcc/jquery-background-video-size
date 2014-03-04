@@ -9,12 +9,11 @@
 (function ($) {
 
   // Collection method.
-  // $.fn.awesome = function () {
-  //   return this.each(function (i) {
-  //     // Do something awesome to each selected element.
-  //     $(this).html('awesome' + i);
-  //   });
-  // };
+  $.fn.backgroundVideo = function ($iframe) {
+    return this.each(function () {
+      return new BackgroundVideo($(this), $iframe);
+    });
+  };
 
   var animationFrame = (function(){
     return  window.requestAnimationFrame       ||
@@ -49,11 +48,21 @@
     });
   };
 
+  var makeIntrinsicWrapper = function(dimensions){
+    return $('<div>')
+    .addClass('big-video-intrinsic-wrapper')
+    .css({
+      position: 'relative',
+      height: 0,
+      'padding-bottom': (parseFloat(dimensions.height/dimensions.width, 10) * 100)+'%'
+    });
+  };
+
   // Static method.
-  $.fn.backgroundVideo = function () {
+  var BackgroundVideo = function ($container, $iframe) {
     var self = this;
-    this.$iframe = this;
-    this.$body = $('body');
+    this.$iframe = $iframe;
+    this.$container = $container;
     this.$window = $(window);
     this.resized = false;
     this.bgVideoSize = {
@@ -62,21 +71,11 @@
     };
     this.vidAR = this.bgVideoSize.width / this.bgVideoSize.height;
 
-    var makeIntrinsicWrapper = function(){
-      return $('<div>')
-      .addClass('big-video-intrinsic-wrapper')
-      .css({
-        position: 'relative',
-        height: 0,
-        'padding-bottom': (parseFloat(self.bgVideoSize.height/self.bgVideoSize.width, 10) * 100)+'%'
-      });
-    };
-
     var wrapIframe = function(){
       self.$iframe
-        .wrap( makeOverflowWrapper() )
-        .wrap( makeScalableWrapper() )
-        .wrap( makeIntrinsicWrapper() )
+        .wrap( makeOverflowWrapper(self.bgVideoSize) )
+        .wrap( makeScalableWrapper(self.bgVideoSize) )
+        .wrap( makeIntrinsicWrapper(self.bgVideoSize) )
         .css({
           position: 'absolute',
           top: 0,
@@ -95,9 +94,9 @@
         
       var winAR = win.width / win.height;
         
-      if (win.width < self.bgVideoSize.width && win.height < self.bgVideoSize.height) {
-            
-      } else if (winAR < self.vidAR) { // Tall screen
+      //if (win.width < self.bgVideoSize.width && win.height < self.bgVideoSize.height) {
+        
+      if (winAR < self.vidAR) { // Tall screen
         var vidWidth = win.height * self.vidAR;
         self.$scaleableWrapper
         .height(win.height)
@@ -108,44 +107,45 @@
           'margin-top' : 0,
           'margin-left' : (vidWidth/2)*(-1)
         });
-        } else if (winAR > self.vidAR) { // wide screen
-          var vidHeight = win.width * (self.bgVideoSize.height / self.bgVideoSize.width);
-          self.$scaleableWrapper
-          .height(vidHeight)
-          .width(win.width)
-          .css({
-            top: '50%',
-            left: 0,
-            'margin-top' : (vidHeight/2)*(-1),
-            'margin-left' : 0
-          });
-        }
+      } else if (winAR > self.vidAR) { // wide screen
+        var vidHeight = win.width * (self.bgVideoSize.height / self.bgVideoSize.width);
+        self.$scaleableWrapper
+        .height(vidHeight)
+        .width(win.width)
+        .css({
+          top: '50%',
+          left: 0,
+          'margin-top' : (vidHeight/2)*(-1),
+          'margin-left' : 0
+        });
+      }
     };
 
-    var setResizeFlag = function(){
-      self.resized = true;
+    var setResizeFlag = function(flag){
+      self.resized = flag;
     };
 
     var animationLoop = function(){
       animationFrame(animationLoop);
       if(self.resized){
         resizeAction();
-        self.resized = false;
+        setResizeFlag(false);
       }
     };
 
     var attachListeners = function(){
-      $(window).on('resize', setResizeFlag);
+      $(window).on('resize', function(){
+        setResizeFlag(true);
+      });
     };
 
-    var init = function(){
+    (function(){ //init
       wrapIframe();
       resizeAction();
       attachListeners();
       animationLoop();
-    };
+    })();
     
-    init();
     return this;
   };
 
