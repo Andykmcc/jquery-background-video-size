@@ -50,7 +50,7 @@
   };
 
   // Static method.
-  $.backgroundVideo = function () {
+  $.fn.backgroundVideo = function () {
     var self = this;
     this.$iframe = this;
     this.$body = $('body');
@@ -148,10 +148,5 @@
     init();
     return this;
   };
-
-  // Static method default options.
-  // $.backgroundVideo.options = {
-    
-  // };
 
 }(jQuery));

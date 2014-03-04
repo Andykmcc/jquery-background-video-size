@@ -13,10 +13,10 @@ In your web page:
 
 ```html
 <script src="jquery.js"></script>
-<script src="dist/background-video-size.min.js"></script>
+<script src="dist/jquery.background-video-size.min.js"></script>
 <script>
 jQuery(function($) {
-  $.awesome(); // "awesome"
+  $('iframe').backgroundVideo();
 });
 </script>
 ```
@@ -26,6 +26,14 @@ _(Coming soon)_
 
 ## Examples
 _(Coming soon)_
+
+## Todos
+- Change syntax to `$('container').backgroundVideo(url, options);`
+- Add functionalty for all block element
+- Change structure to allow for better testing
+- Full test coverage
+- Setup working demo
+- Match W3C spec. for background-size + options
 
 ## Release History
 _(Nothing yet)_
