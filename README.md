@@ -15,8 +15,8 @@ In your web page:
 <script src="jquery.js"></script>
 <script src="dist/jquery.background-video-size.min.js"></script>
 <script>
-jQuery(function($) {
-  $('iframe').backgroundVideo();
+$(document).ready(function(){
+    $('body').backgroundVideo($('iframe'));
 });
 </script>
 ```
