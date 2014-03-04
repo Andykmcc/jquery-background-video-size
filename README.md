@@ -28,8 +28,8 @@ _(Coming soon)_
 _(Coming soon)_
 
 ## Todos
-- Change syntax to `$('container').backgroundVideo(url, options);`
 - Add functionalty for all block element
+- Add basic options
 - Change structure to allow for better testing
 - Full test coverage
 - Setup working demo
