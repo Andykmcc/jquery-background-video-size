@@ -1,0 +1,28 @@
+{
+  "name": "background-video-size",
+  "title": "Background Video Size jQuery Plugin",
+  "description": "A jQuery plugin that allows background-size style functionality with embedded iframe video",
+  "version": "0.0.0",
+  "homepage": "",
+  "author": {
+    "name": "Andy McCoy",
+    "url": "https://github.com/andykmcc"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "bugs": "",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    }
+  ],
+  "dependencies": {
+    "jquery": "~1.10.x"
+  },
+  "keywords": [
+    "jquery-plugin"
+  ]
+}
