@@ -86,7 +86,7 @@
 
   // Detects if provided argument is a jQuery object
   // a DOM object, or a string (should be a URL)
-  var getJqueryiframe = function(iframe){
+  var getJqueryIframe = function(iframe){
     if(!iframe) { 
       throw 'Please provide a valid iframe, embed url or youtube video id';
     }
@@ -107,10 +107,10 @@
   // Constructor for background video
   var BackgroundVideo = function ($container, iframe) {
     var self = this;
-    this.$iframe = getJqueryiframe(iframe);
     this.$container = $container;
     this.$window = $(window);
     this.resized = false;
+    this.$iframe = getJqueryIframe(iframe);
     this.bgVideoSize = {
       width: self.$iframe.width(),
       height: self.$iframe.height(),

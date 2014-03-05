@@ -3,13 +3,14 @@
 * Copyright (c) 2014 Andy McCoy; Licensed MIT */
 (function ($) {
 
-  // Collection method.
-  $.fn.backgroundVideo = function ($iframe) {
+  // Register Collection method with jquery
+  $.fn.backgroundVideo = function (iframe) {
     return this.each(function () {
-      return new BackgroundVideo($(this), $iframe);
+      return new BackgroundVideo($(this), iframe);
     });
   };
 
+  // requestAnimationFrame shim thanks to Paul Irish
   var animationFrame = (function(){
     return  window.requestAnimationFrame       ||
             window.webkitRequestAnimationFrame ||
@@ -19,6 +20,8 @@
             };
   })();
 
+  // Wrapper to contain out work. It prevents
+  // the background video from creating scrolls
   var makeOverflowWrapper = function(){
     return $('<div>')
     .addClass('big-video-wrapper')
@@ -33,6 +36,9 @@
     });
   };
 
+  // This is the element that whose size is actually
+  // adjusted. See makeIntrinsicWrapper to understand
+  // why this container is necessary.
   var makeScalableWrapper = function(){
     return $("<div>")
     .addClass('big-video-scaleable-wrapper')
@@ -43,6 +49,9 @@
     });
   };
 
+  // This container directly wraps the iframe. 
+  // It maintains a constant aspect ratio and inherits
+  // the width of its parent element.
   var makeIntrinsicWrapper = function(dimensions){
     return $('<div>')
     .addClass('big-video-intrinsic-wrapper')
@@ -53,19 +62,58 @@
     });
   };
 
-  // Static method.
-  var BackgroundVideo = function ($container, $iframe) {
+  // converts provided string into iframe
+  var generateIframeFromString = function(url){
+    var $template = $('<iframe width="420" height="315" frameborder="0" allowfullscreen></iframe>');
+    var urls = {
+      youtube : '//www.youtube.com/embed/'
+    };
+
+    if(url.match(/http|https|www/i)){
+      $template.attr('src', url);
+    }
+    else{
+      $template.attr('src', urls.youtube+url);
+    }
+    $('body').append($template);
+    return $template;
+  };
+
+  // Detects if provided argument is a jQuery object
+  // a DOM object, or a string (should be a URL)
+  var getJqueryIframe = function(iframe){
+    if(!iframe) { 
+      throw 'Please provide a valid iframe, embed url or youtube video id';
+    }
+    if(iframe.jquery){ 
+      return iframe;
+    }
+    else if(iframe.nodeType === 1){
+      return $(iframe);
+    }
+    else if(typeof iframe === 'string'){
+      return generateIframeFromString(iframe);
+    }
+    else{
+      throw 'Please provide a valid iframe, embed url or youtube video id';
+    }
+  };
+
+  // Constructor for background video
+  var BackgroundVideo = function ($container, iframe) {
     var self = this;
-    this.$iframe = $iframe;
     this.$container = $container;
     this.$window = $(window);
     this.resized = false;
+    this.$iframe = getJqueryIframe(iframe);
     this.bgVideoSize = {
       width: self.$iframe.width(),
       height: self.$iframe.height(),
     };
     this.vidAR = this.bgVideoSize.width / this.bgVideoSize.height;
 
+    // Adds the approriate wrapper elements to the iframe.
+    // This adds the necessary style to iframe
     var wrapIframe = function(){
       self.$iframe
         .wrap( makeOverflowWrapper(self.bgVideoSize) )
@@ -81,6 +129,8 @@
       self.$scaleableWrapper = $('.big-video-scaleable-wrapper');
     };
 
+    // This is where the magis happens. It contains the 
+    // logic for calculating and sizing the iframe.
     var resizeAction = function() {
       var win = {
         height  : self.$window.height(),
@@ -116,10 +166,12 @@
       }
     };
 
+    // a setter method of my resize flag. 
     var setResizeFlag = function(flag){
       self.resized = flag;
     };
 
+    // animation loop that checks if a resize event occured
     var animationLoop = function(){
       animationFrame(animationLoop);
       if(self.resized){
@@ -128,19 +180,23 @@
       }
     };
 
+    // attaches the resize event listener.
+    // maybe others to come.
     var attachListeners = function(){
       $(window).on('resize', function(){
         setResizeFlag(true);
       });
     };
 
-    (function(){ //init
+    // Initialize function called at instantiation
+    (function(){ 
       wrapIframe();
       resizeAction();
       attachListeners();
       animationLoop();
     })();
     
+    // returns the constructor
     return this;
   };
 
