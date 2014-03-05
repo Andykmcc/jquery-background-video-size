@@ -8,10 +8,10 @@
 
 (function ($) {
 
-  // Collection method.
-  $.fn.backgroundVideo = function ($iframe) {
+  // Register Collection method with jquery
+  $.fn.backgroundVideo = function (iframe) {
     return this.each(function () {
-      return new BackgroundVideo($(this), $iframe);
+      return new BackgroundVideo($(this), iframe);
     });
   };
 
@@ -67,10 +67,47 @@
     });
   };
 
+  // converts provided string into iframe
+  var generateIframeFromString = function(url){
+    var $template = $('<iframe width="420" height="315" frameborder="0" allowfullscreen></iframe>');
+    var urls = {
+      youtube : '//www.youtube.com/embed/'
+    };
+
+    if(url.match(/http|https|www/i)){
+      $template.attr('src', url);
+    }
+    else{
+      $template.attr('src', urls.youtube+url);
+    }
+    $('body').append($template);
+    return $template;
+  };
+
+  // Detects if provided argument is a jQuery object
+  // a DOM object, or a string (should be a URL)
+  var getJqueryiframe = function(iframe){
+    if(!iframe) { 
+      throw 'Please provide a valid iframe, embed url or youtube video id';
+    }
+    if(iframe.jquery){ 
+      return iframe;
+    }
+    else if(iframe.nodeType === 1){
+      return $(iframe);
+    }
+    else if(typeof iframe === 'string'){
+      return generateIframeFromString(iframe);
+    }
+    else{
+      throw 'Please provide a valid iframe, embed url or youtube video id';
+    }
+  };
+
   // Constructor for background video
-  var BackgroundVideo = function ($container, $iframe) {
+  var BackgroundVideo = function ($container, iframe) {
     var self = this;
-    this.$iframe = $iframe;
+    this.$iframe = getJqueryiframe(iframe);
     this.$container = $container;
     this.$window = $(window);
     this.resized = false;
